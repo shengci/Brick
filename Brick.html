@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Break the Bricks</title>
+    <style type="text/css">
+		#div1 {
+			width: 600px;
+			height: 600px;
+			border: 1px solid black;
+			position: relative;
+			margin: 100px auto;
+		}
+		#ball {
+			width: 20px;
+			height: 20px;
+			background-color: red;
+			border-radius: 50%;
+			position: absolute;
+			left: 290px;
+			bottom: 30px;
+		}
+		#bat {
+			width: 100px;
+			height: 30px;
+			background-color: blue;
+			position: absolute;
+			left: 250px;
+			bottom: 0px;
+		}
+		#brick div {
+			width: 98px;
+			height: 18px;
+			border: 1px solid black;
+			float: left;
+		}
+	</style>
+	<script type="text/javascript">
+		window.onload = function () {
+			var odiv1=document.getElementById("div");
+			var oball=document.getElementById("ball");
+			var obat=document.getElementById("bat");
+			var obrick=document.getElementById("brick");
+			var abrick=obrick.getElementsByTagName("div");
+
+			dragX(obat);
+			createbrick(60);
+
+			var speedX=parseInt(Math.random()*4)+3;
+			var speedY=-(parseInt(Math.random()*3)+3);
+
+			setInterval(function (){
+				oball.style.left=oball.offsetLeft+speedX+'px';
+				oball.style.top=oball.offsetTop+speedY+'px';
+				if (oball.offsetLeft >=580 || oball.offsetLeft <= 0) {
+					speedX *=-1;
+				}
+				if (oball.offsetTop <= 0) {
+					speedY *=-1;
+				}
+				if (oball.offsetTop >=580) {
+					alert("挑战失败");
+					window.location.reload();
+					speedY *=-1;
+				}
+
+				if (kanck(oball,obat)) {
+					speedY *=-1;
+				}
+
+				for (var i = 0; i < abrick.length; i++) {
+					if (kanck(abrick[i],oball)) {
+						speedY *=-1;
+						obrick.removeChild(abrick[i]);
+						break;
+					}
+				}
+
+				if (abrick.length < 1) {
+					alert("挑战成功");
+					window.location.reload();
+				}
+			},20);
+		}
+
+		function dragX(node){
+			node.onmousedown=function(ev){
+				var e=ev ||　window.event;
+				var offsetX=e.clientX-node.offsetLeft;
+
+				document.onmousemove=function(ev){
+					var e=ev || window.event;
+					var l=e.clientX-offsetX;
+					if (l<=0) {
+						l=0;
+					}
+					if (l>=500) {
+						l=500;
+					}
+					node.style.left=l+'px';
+				}
+			}
+			document.onmouseup=function(){
+				document.onmousemove=null;
+			}
+		}
+
+		function createbrick(n){
+			var obrick=document.getElementById("brick");
+			for (var i = 0; i < n; i++) {
+				var node=document.createElement("div");
+				node.style.backgroundColor=randomColor();
+				obrick.appendChild(node);
+			}
+
+			var abrick=obrick.getElementsByTagName("div");
+			for (var i = 0; i < abrick.length; i++) {
+				abrick[i].style.left=abrick[i].offsetLeft+'px';
+				abrick[i].style.top=abrick[i].offsetTop+'px';
+			}
+			for (var i = 0; i < abrick.length; i++) {
+				abrick[i].style.position='absolute';
+			}
+		}
+
+		function randomColor(){
+			var str="rgba("+parseInt(Math.random()*256)+","+parseInt(Math.random()*256)+","+parseInt(Math.random()*256)+")";
+			return str;
+		}
+
+		function kanck(node1,node2){
+			var l1=node1.offsetLeft;
+			var r1=node1.offsetLeft+node1.offsetWidth;
+			var t1=node1.offsetTop;
+			var b1=node1.offsetTop+node1.offsetHeight;
+
+			var l2=node2.offsetLeft;
+			var r2=node2.offsetLeft+node2.offsetWidth;
+			var t2=node2.offsetTop;
+			var b2=node2.offsetTop+node2.offsetHeight;
+
+			if (l2 > r1 || r2 < l1 || t2 > b1 || b2 < t1) {
+				return false;
+			}else{
+				return true;
+			}
+		}
+	</script>
+</head>
+<body>
+	<div id="div1">
+		<div id="ball"></div>
+		<div id="bat"></div>
+		<div id="brick"></div>
+	</div>
+
+</body>
+</html>
